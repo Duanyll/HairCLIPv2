@@ -1,0 +1,36 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.autopep8",
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cpptools",
+                "GitHub.copilot",
+                "ms-vscode.hexeditor"
+                // Add more extensions here to use in the container
+            ]
+        }
+    },
+    "capAdd": [
+        "SYS_PTRACE" // Required to use gdb
+    ],
+    "runArgs": [
+        // Enable host.docker.internal DNS name
+        "--add-host=host.docker.internal:host-gateway",
+        // Enable CUDA support
+        "--gpus",
+        "all"
+    ],
+    "mounts": [
+        // UNCOMMENT AND TYPE YOUR ABSOLUTE PATH TO THE DATASETS FOLDER
+        // "type=bind,source=/absolute/path/to/datasets,target=/datasets"
+    ],
+    "shutdownAction": "none",
+    "hostRequirements": {
+        "gpu": true
+    }
+}
