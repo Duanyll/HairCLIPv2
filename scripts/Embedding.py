@@ -91,12 +91,14 @@ class Embedding(nn.Module):
                 .format(loss, loss_dic['l2'], loss_dic['percep'], loss_dic['p-norm']))
         return latent_in
 
-    def invert_image_in_FS(self, image_path=None):
+    def invert_image_in_FS(self, image_path=None, latent_W=None):
         ref_im = Image.open(image_path).convert('RGB')
         ref_im_L = self.image_transform(ref_im.resize((256, 256), PIL.Image.LANCZOS)).unsqueeze(0)
         ref_im_H = self.image_transform(ref_im.resize((1024, 1024), PIL.Image.LANCZOS)).unsqueeze(0)
 
-        latent_W = self.invert_image_in_W(image_path=image_path).clone().detach()
+        if latent_W is None:
+            latent_W = self.invert_image_in_W(image_path)
+        latent_W = latent_W.clone().detach()
         F_init, _ = self.generator([latent_W], input_is_latent=True, return_latents=False, start_layer=0, end_layer=3)
         optimizer_FS, latent_F, latent_S = self.setup_FS_optimizer(latent_W, F_init)
 

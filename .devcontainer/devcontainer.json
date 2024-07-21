@@ -10,8 +10,9 @@
                 "ms-vscode.cmake-tools",
                 "ms-vscode.cpptools",
                 "GitHub.copilot",
-                "ms-vscode.hexeditor"
-                // Add more extensions here to use in the container
+                "ms-vscode.hexeditor",
+                "KevinRose.vsc-python-indent",
+                "Rubymaniac.vscode-paste-and-indent"
             ]
         }
     },

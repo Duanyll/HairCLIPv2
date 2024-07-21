@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    ports:
+      - 7860
+    depends_on:
+      - db
+    environment:
+      - CACHE_TIME=3600
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - torch_cache:/root/.cache/torch/
+  db:
+    image: redis:latest
+
+volumes:
+  torch_cache:

@@ -37,18 +37,11 @@ class RefProxy(torch.nn.Module):
 
     def load_hairstyle_ref(self, hairstyle_ref_name):
         image_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
-        hairstyle_img_path = f'{self.opts.ref_img_dir}/{hairstyle_ref_name}'
+        hairstyle_img_path = hairstyle_ref_name
         ref_PIL = Image.open(hairstyle_img_path).convert('RGB')
         ref_img = image_transform(ref_PIL).unsqueeze(0).cuda()
-
-        if not os.path.isfile(os.path.join(self.opts.ref_latent_dir, f"{os.path.splitext(hairstyle_ref_name)[0]}.npy")):
-            inverted_wplus_code = self.ii2s.invert_image_in_W(image_path=hairstyle_img_path)
-            save_latent = inverted_wplus_code.detach().cpu().numpy()
-            save_latent_path = os.path.join(self.opts.ref_latent_dir, f'{os.path.splitext(hairstyle_ref_name)[0]}.npy')
-            np.save(save_latent_path, save_latent)
-
-        latent_W_optimized = torch.from_numpy(np.load(os.path.join(self.opts.ref_latent_dir, f"{os.path.splitext(hairstyle_ref_name)[0]}.npy"))).cuda().requires_grad_(True)
-        return ref_img, latent_W_optimized
+        inverted_wplus_code = self.ii2s.invert_image_in_W(image_path=hairstyle_img_path).detach().requires_grad_(True)
+        return ref_img, inverted_wplus_code
 
     def inference_on_kp_extractor(self, input_image):
         return self.kp_extractor.face_alignment_net(((F.interpolate(input_image, size=(256, 256)) + 1) / 2).clamp(0, 1))
