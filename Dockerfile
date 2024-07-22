@@ -1,4 +1,8 @@
-FROM pcloud/gdown:latest as downloader
+FROM pcloud/gdown:latest AS downloader
+
+# If there are issues with proxy in pcloud/gdown, you can use the following command to download the files
+# FROM python:3.8-slim AS downloader
+# RUN pip install gdown
 
 RUN gdown 1g8S81ZybmrF86OjvjLYJzx-wx83ZOiIw
 RUN gdown 1OG6t7q4PpHOoYNdP-ipoxuqYbfMSgPta
@@ -17,7 +21,7 @@ RUN rm /etc/apt/sources.list.d/cuda.list \
 
 RUN pip install -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com \
     ftfy regex tqdm matplotlib jupyter ipykernel opencv-python scikit-image kornia==0.6.7 face-alignment==1.3.5 dlib==19.22.1 \
-    ninja gradio redis
+    ninja gradio==4.29.0 redis
 
 RUN pip install git+https://github.com/openai/CLIP.git
 
@@ -27,3 +31,4 @@ COPY --from=downloader /data/* /workspace/pretrained_models/
 CMD python server.py
 
 EXPOSE 7860
+ENV GRADIO_SERVER_NAME="0.0.0.0"

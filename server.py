@@ -1,8 +1,9 @@
-import gradio as gr
 from inference import InferenceProxy
+import gradio as gr
 
 def main():
     proxy = InferenceProxy()
+    print(">>> Waiting Gradio to start...")
     def edit_by_text(image_path, text_cond):
         return proxy.edit_by_text(image_path, text_cond)
     def edit_by_ref(image_path, ref_path):

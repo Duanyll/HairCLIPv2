@@ -2,22 +2,30 @@ services:
   app:
     build: .
     ports:
-      - 7860
+      - 7860:7860
     depends_on:
       - db
     environment:
       - CACHE_TIME=3600
+      - REDIS_HOST=db
+      - TORCH_CUDA_ARCH_LIST="8.6+PTX" 
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
+              count: all
               capabilities: [gpu]
     volumes:
-      - torch_cache:/root/.cache/torch/
+      - cache:/root/.cache/
+    command: python server.py
+    # The -it flag is necessary to prevent stucking in startup. I don't know why. 
+    stdin_open: true
+    tty: true
   db:
     image: redis:latest
+    ports:
+      - 6379:6379
 
 volumes:
-  torch_cache:
+  cache:

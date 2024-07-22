@@ -1,5 +1,7 @@
 import torch
+print(">>> Importing StyleGAN2 model...")
 from models.stylegan2.model import Generator
+print(">>> Importing BiSeNet model...")
 from models.face_parsing.model import BiSeNet
 
 def load_base_models(opts):

@@ -14,6 +14,7 @@ fused = load(
         os.path.join(module_path, "fused_bias_act_kernel.cu"),
     ],
 )
+print(">>> Fused loaded")
 
 
 class FusedLeakyReLUFunctionBackward(Function):

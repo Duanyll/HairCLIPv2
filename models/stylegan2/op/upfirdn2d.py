@@ -14,6 +14,7 @@ upfirdn2d_op = load(
         os.path.join(module_path, "upfirdn2d_kernel.cu"),
     ],
 )
+print(">>> Upfirdn2d loaded")
 
 
 class UpFirDn2dBackward(Function):
