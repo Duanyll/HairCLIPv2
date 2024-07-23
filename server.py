@@ -1,4 +1,5 @@
 from inference import InferenceProxy
+from PIL import ImageColor
 import gradio as gr
 
 def main():
@@ -12,7 +13,9 @@ def main():
         return proxy.edit_color(image_path, ref_path)
     def edit_color_by_value(image_path, color_cond):
         # Parse HTML color to RGB tuple
-        color_cond = tuple(int(color_cond[i:i+2], 16) for i in (1, 3, 5))
+        if color_cond is None:
+            color_cond = "#000000"
+        color_cond = ImageColor.getcolor(color_cond, "RGB")
         return proxy.edit_color(image_path, color_cond)
     app = gr.TabbedInterface([
         gr.Interface(edit_by_text, 

@@ -51,7 +51,7 @@ class InferenceProxy:
         
     def _prepare_src(self, image):
         src_latent, src_feature = self.latent_cache.invert_image_in_FS(image=image)
-        src_image = self.image_transform(src_image).unsqueeze(0).cuda()
+        src_image = self.image_transform(image).unsqueeze(0).cuda()
         return src_latent, src_feature, src_image
 
     def edit_by_text(self, image, text_cond):

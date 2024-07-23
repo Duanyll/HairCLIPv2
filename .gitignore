@@ -1,6 +1,7 @@
 pretrained_models/
 test_images/
 flagged/
+cached_models/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

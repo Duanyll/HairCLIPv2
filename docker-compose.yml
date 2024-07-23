@@ -1,6 +1,7 @@
 services:
   app:
-    build: .
+    # build: .
+    image: duanyll/hairclipv2:latest
     ports:
       - 7860:7860
     depends_on:
@@ -15,8 +16,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    volumes:
-      - cache:/root/.cache/
     command: python server.py
     # The -it flag is necessary to prevent stucking in startup. I don't know why. 
     stdin_open: true
@@ -25,6 +24,3 @@ services:
     image: redis:latest
     ports:
       - 6379:6379
-
-volumes:
-  cache:

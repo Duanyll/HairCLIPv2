@@ -27,6 +27,9 @@ RUN pip install git+https://github.com/openai/CLIP.git
 
 COPY . /workspace
 COPY --from=downloader /data/* /workspace/pretrained_models/
+# cached_models are copied from /root/.cache/ manually, after first running the server
+# The below command restores /root/.cache/
+RUN mv /workspace/cached_models/* /root/.cache/
 
 CMD python server.py
 
