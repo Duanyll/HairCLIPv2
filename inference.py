@@ -49,14 +49,13 @@ class InferenceProxy:
         self.color_proxy = ColorProxy(self.opts, self.g_ema, self.seg)
         print(">>> Color proxy loaded")
         
-    def _prepare_src(self, image_path):
-        src_latent, src_feature = self.latent_cache.invert_image_in_FS(image_path)
-        src_image = Image.open(image_path).convert('RGB')
+    def _prepare_src(self, image):
+        src_latent, src_feature = self.latent_cache.invert_image_in_FS(image=image)
         src_image = self.image_transform(src_image).unsqueeze(0).cuda()
         return src_latent, src_feature, src_image
 
-    def edit_by_text(self, image_path, text_cond):
-        src_latent, src_feature, src_image = self._prepare_src(image_path)
+    def edit_by_text(self, image, text_cond):
+        src_latent, src_feature, src_image = self._prepare_src(image)
         input_mask = torch.argmax(self.seg(src_image)[1], dim=1).long().clone().detach()
         latent_bald, _ = self.bald_proxy(src_latent)
         latent_global, _ = self.text_proxy(text_cond, src_image, from_mean=True)
@@ -66,19 +65,19 @@ class InferenceProxy:
         self.latent_cache.cache_latent(edited_hairstyle_img, latent_w=src_latent, latent_fs=src_feature)
         return edited_hairstyle_img
     
-    def edit_by_ref(self, image_path, ref_path):
-        src_latent, src_feature, src_image = self._prepare_src(image_path)
+    def edit_by_ref(self, image, ref_image):
+        src_latent, src_feature, src_image = self._prepare_src(image)
         input_mask = torch.argmax(self.seg(src_image)[1], dim=1).long().clone().detach()
         latent_bald, _ = self.bald_proxy(src_latent)
-        latent_global, _ = self.ref_proxy(ref_path, src_image)
+        latent_global, _ = self.ref_proxy(ref_image, src_image)
         src_feature, edited_hairstyle_img = hairstyle_feature_blending(
             self.g_ema, self.seg, src_latent, src_feature, input_mask, latent_bald, latent_global=latent_global)
         edited_hairstyle_img = process_display_input(edited_hairstyle_img)
         self.latent_cache.cache_latent(edited_hairstyle_img, latent_w=src_latent, latent_fs=src_feature)
         return edited_hairstyle_img
     
-    def edit_color(self, image_path, color_cond):
-        src_latent, src_feature, src_image = self._prepare_src(image_path)
+    def edit_color(self, image, color_cond):
+        src_latent, src_feature, src_image = self._prepare_src(image)
         visual_color_list, visual_final_list = self.color_proxy(color_cond, src_image, src_latent, src_feature)
         return visual_final_list[-1]
     

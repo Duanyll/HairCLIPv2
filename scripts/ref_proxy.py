@@ -35,12 +35,10 @@ class RefProxy(torch.nn.Module):
             param.requires_grad = False
         return kp_extractor
 
-    def load_hairstyle_ref(self, hairstyle_ref_name):
+    def load_hairstyle_ref(self, ref_PIL):
         image_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
-        hairstyle_img_path = hairstyle_ref_name
-        ref_PIL = Image.open(hairstyle_img_path).convert('RGB')
         ref_img = image_transform(ref_PIL).unsqueeze(0).cuda()
-        inverted_wplus_code = self.ii2s.invert_image_in_W(image_path=hairstyle_img_path).detach().requires_grad_(True)
+        inverted_wplus_code = self.ii2s.invert_image_in_W(image=ref_PIL).detach().requires_grad_(True)
         return ref_img, inverted_wplus_code
 
     def inference_on_kp_extractor(self, input_image):
@@ -53,8 +51,8 @@ class RefProxy(torch.nn.Module):
         input_img_256 = F.interpolate(input_image, size=(256, 256))
         return input_img_256, input_hairmask_256
 
-    def forward(self, hairstyle_ref_name, src_image, painted_mask=None):
-        ref_img, latent_W_optimized = self.load_hairstyle_ref(hairstyle_ref_name)
+    def forward(self, ref_PIL, src_image, painted_mask=None):
+        ref_img, latent_W_optimized = self.load_hairstyle_ref(ref_PIL)
         ref_img_256, ref_hairmask_256 = self.gen_256_img_hairmask(ref_img)
         optimizer = torch.optim.Adam([latent_W_optimized], lr=self.opts.lr_ref)
         latent_end = latent_W_optimized[:, 6:, :].clone().detach()

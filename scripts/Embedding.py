@@ -67,8 +67,11 @@ class Embedding(nn.Module):
     def setup_embedding_loss_builder(self):
         self.loss_builder = EmbeddingLossBuilder(self.opts)
 
-    def invert_image_in_W(self, image_path=None):
-        ref_im = Image.open(image_path).convert('RGB')
+    def invert_image_in_W(self, image_path=None, image=None):
+        if image is not None:
+            ref_im = image
+        else:
+            ref_im = Image.open(image_path).convert('RGB')
         ref_im_L = self.image_transform(ref_im.resize((256, 256), PIL.Image.LANCZOS)).unsqueeze(0)
         ref_im_H = self.image_transform(ref_im.resize((1024, 1024), PIL.Image.LANCZOS)).unsqueeze(0)
 
@@ -91,8 +94,11 @@ class Embedding(nn.Module):
                 .format(loss, loss_dic['l2'], loss_dic['percep'], loss_dic['p-norm']))
         return latent_in
 
-    def invert_image_in_FS(self, image_path=None, latent_W=None):
-        ref_im = Image.open(image_path).convert('RGB')
+    def invert_image_in_FS(self, image_path=None, image=None, latent_W=None):
+        if image is not None:
+            ref_im = image
+        else:
+            ref_im = Image.open(image_path).convert('RGB')
         ref_im_L = self.image_transform(ref_im.resize((256, 256), PIL.Image.LANCZOS)).unsqueeze(0)
         ref_im_H = self.image_transform(ref_im.resize((1024, 1024), PIL.Image.LANCZOS)).unsqueeze(0)
 

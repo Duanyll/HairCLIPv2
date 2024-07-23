@@ -16,22 +16,22 @@ def main():
         return proxy.edit_color(image_path, color_cond)
     app = gr.TabbedInterface([
         gr.Interface(edit_by_text, 
-                     inputs=[gr.Image(type="filepath", label="Image"), gr.Textbox(label="Text")],
+                     inputs=[gr.Image(type="pil", label="Image"), gr.Textbox(label="Text")],
                      outputs="image",
                      api_name="edit_by_text"
         ),
         gr.Interface(edit_by_ref, 
-                     inputs=[gr.Image(type="filepath", label="Image"), gr.Image(type="filepath", label="Reference")],
+                     inputs=[gr.Image(type="pil", label="Image"), gr.Image(type="pil", label="Reference")],
                      outputs="image",
                      api_name="edit_by_ref"
         ),
         gr.Interface(edit_color_by_ref, 
-                     inputs=[gr.Image(type="filepath", label="Image"), gr.Image(type="filepath", label="Reference")],
+                     inputs=[gr.Image(type="pil", label="Image"), gr.Image(type="pil", label="Reference")],
                      outputs="image",
                      api_name="edit_color_by_ref"
         ),
         gr.Interface(edit_color_by_value, 
-                     inputs=[gr.Image(type="filepath", label="Image"), gr.ColorPicker(label="Color")],
+                     inputs=[gr.Image(type="pil", label="Image"), gr.ColorPicker(label="Color")],
                      outputs="image",
                      api_name="edit_color_by_value"
         ),

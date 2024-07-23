@@ -8,7 +8,6 @@ services:
     environment:
       - CACHE_TIME=3600
       - REDIS_HOST=db
-      - TORCH_CUDA_ARCH_LIST="8.6+PTX" 
     deploy:
       resources:
         reservations:

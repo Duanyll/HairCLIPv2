@@ -19,20 +19,19 @@ class LatentCache:
         else:
             self.redis = None
             
-    def _get_image_hash(self, image_path):
-        image = Image.open(image_path)
+    def _get_image_hash(self, image):
         image_bytes = image.tobytes()
         return hashlib.md5(image_bytes).hexdigest()
         
-    def invert_image_in_W(self, image_path):
+    def invert_image_in_W(self, image):
         if self.redis is not None:
-            image_hash = self._get_image_hash(image_path)
+            image_hash = self._get_image_hash(image)
             cache_key = f"latent_w:{image_hash}"
             latent_w = self.redis.get(cache_key)
             if latent_w is not None:
                 buffer = io.BytesIO(latent_w)
                 return torch.from_numpy(np.load(buffer)).cuda()
-        latent_w = self.ii2s.invert_image_in_W(image_path=image_path)
+        latent_w = self.ii2s.invert_image_in_W(image=image)
         if self.redis is not None:
             buffer = io.BytesIO()
             np.save(buffer, latent_w.detach().cpu().numpy())
@@ -40,17 +39,17 @@ class LatentCache:
             self.redis.set(cache_key, buffer.read(), ex=CACHE_TIME)
         return latent_w
     
-    def invert_image_in_FS(self, image_path):
-        latent_w = self.invert_image_in_W(image_path)
+    def invert_image_in_FS(self, image):
+        latent_w = self.invert_image_in_W(image)
         if self.redis is not None:
-            image_hash = self._get_image_hash(image_path)
+            image_hash = self._get_image_hash(image)
             cache_key = f"latent_fs:{image_hash}"
             latent_fs = self.redis.get(cache_key)
             if latent_fs is not None:
                 buffer = io.BytesIO(latent_fs)
                 return latent_w, torch.from_numpy(np.load(buffer)).cuda()
         latent_w.requires_grad_(True)
-        latent_w, latent_fs = self.ii2s.invert_image_in_FS(image_path=image_path, latent_W=latent_w)
+        latent_w, latent_fs = self.ii2s.invert_image_in_FS(image=image, latent_W=latent_w)
         if self.redis is not None:
             buffer = io.BytesIO()
             np.save(buffer, latent_fs.detach().cpu().numpy())
@@ -61,7 +60,7 @@ class LatentCache:
     def cache_latent(self, image, latent_w=None, latent_fs=None):
         if self.redis is None:
             return
-        image_hash = hashlib.md5(image.tobytes()).hexdigest()
+        image_hash = self._get_image_hash(image)
         if latent_w is not None:
             buffer = io.BytesIO()
             np.save(buffer, latent_w.detach().cpu().numpy())

@@ -38,15 +38,18 @@ class ColorProxy(torch.nn.Module):
                 return 'text'
         elif isinstance(input_data, tuple) and len(input_data) == 3:
             return 'rgb'
-        else:
-            raise ValueError('Invalid input. Unsupported data type or format.')
+        elif isinstance(input_data, Image.Image):
+            return 'ref'
 
     def pre_process_edit_cond(self, editing_mode, color_cond):
         color_image_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
         if editing_mode == 'text':
             return color_cond
         elif editing_mode == 'ref':
-            color_ref_img = Image.open(f'{self.opts.ref_img_dir}/{color_cond}')
+            if isinstance(color_cond, Image.Image):
+                color_ref_img = color_cond
+            else:
+                color_ref_img = Image.open(f'{self.opts.ref_img_dir}/{color_cond}')
             color_cond = color_image_transform(color_ref_img).unsqueeze(0).cuda()
             self.opts.avg_color_lambda_color = 0.01
         elif editing_mode == 'rgb':
